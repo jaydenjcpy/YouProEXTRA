@@ -1,4 +1,4 @@
-name: Build YouProEXTRA IPA (Test)
+name: Build YouProEXTRA IPA
 on:
   workflow_dispatch:
     inputs:
@@ -92,8 +92,9 @@ jobs:
         run: |
           git clone --quiet --depth=1 -n --filter=tree:0 https://github.com/Tonwalter888/iOS-SDKs.git
           cd iOS-SDKs
-          git sparse-checkout set --no-cone iPhoneOS18.6.sdk
+          git sparse-checkout set --no-cone iPhoneOS16.5.sdk
           git checkout
+          mkdir -p $THEOS/sdks
           mv *.sdk $THEOS/sdks
 
       - name: Install cyan and tbd
