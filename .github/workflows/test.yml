@@ -1,4 +1,5 @@
-name: Build YouProEXTRA IPA TEST
+name: Build YouProEXTRA IPA
+
 on:
   workflow_dispatch:
     inputs:
@@ -94,8 +95,8 @@ jobs:
           cd iOS-SDKs
           git sparse-checkout set --no-cone iPhoneOS16.5.sdk
           git checkout
-          mkdir -p $THEOS/sdks
-          mv *.sdk $THEOS/sdks
+          mkdir -p "$THEOS/sdks"
+          mv *.sdk "$THEOS/sdks"
 
       - name: Install cyan and tbd
         run: |
@@ -109,17 +110,17 @@ jobs:
           cd OpenYouTubeSafariExtension
           git sparse-checkout set --no-cone OpenYouTubeSafariExtension.appex
           git checkout
-          mv *.appex ${{ github.workspace }}
+          mv *.appex "${{ github.workspace }}"
 
       - name: Clone YouTubeHeader
         run: |
-          git clone --quiet --depth=1 https://github.com/PoomSmart/YouTubeHeader.git $THEOS/include/YouTubeHeader
+          git clone --quiet --depth=1 https://github.com/PoomSmart/YouTubeHeader.git "$THEOS/include/YouTubeHeader"
           if [ "${{ inputs.demc }}" = "true" ]; then
             cp -r "$THEOS/include/YouTubeHeader" "$THEOS/include/YTHeaders"
           fi
 
       - name: Clone PSHeader
-        run: git clone --quiet --depth=1 https://github.com/PoomSmart/PSHeader.git $THEOS/include/PSHeader
+        run: git clone --quiet --depth=1 https://github.com/PoomSmart/PSHeader.git "$THEOS/include/PSHeader"
 
       - name: Clone YouPiP
         run: git clone --quiet --depth=1 https://github.com/PoomSmart/YouPiP.git
@@ -152,8 +153,31 @@ jobs:
       - name: Clone YouLoop
         run: git clone --quiet --depth=1 https://github.com/bhackel/YouLoop.git
 
-      - name: Clone Alderis
-        run: git clone --quiet --depth=1 https://github.com/hbang/Alderis.git
+      - name: Download Alderis (prebuilt)
+        run: |
+          # Avoid building Alderis from source (often fails due to missing private frameworks like Preferences.framework)
+          ALDERIS_DEB_URL=$(python3 - <<'PY'
+          import json
+          import urllib.request
+
+          api = "https://api.github.com/repos/hbang/Alderis/releases/latest"
+          with urllib.request.urlopen(api) as r:
+              data = json.load(r)
+
+          assets = data.get("assets", [])
+
+          # Prefer a .deb asset if present (rootless packaging exists in releases)
+          for a in assets:
+              name = (a.get("name") or "").lower()
+              if name.endswith(".deb"):
+                  print(a["browser_download_url"])
+                  break
+          else:
+              raise SystemExit("No .deb asset found in latest Alderis release")
+          PY
+          )
+          echo "Alderis deb: $ALDERIS_DEB_URL"
+          curl -L "$ALDERIS_DEB_URL" -o alderis.deb
 
       - name: Clone YouSlider
         run: git clone --quiet --depth=1 https://github.com/PoomSmart/YouSlider.git
@@ -198,138 +222,132 @@ jobs:
         run: |
           cd YouPiP
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youpip.deb
+          mv packages/*.deb "${{ github.workspace }}/youpip.deb"
 
       - name: Build YTUHD
         run: |
           cd YTUHD
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytuhd.deb
+          mv packages/*.deb "${{ github.workspace }}/ytuhd.deb"
 
       - name: Build Return-YouTube-Dislikes
         run: |
           cd Return-YouTube-Dislikes
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ryd.deb
+          mv packages/*.deb "${{ github.workspace }}/ryd.deb"
 
       - name: Build YouGroupSettings
         run: |
           cd YouGroupSettings
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ygs.deb
+          mv packages/*.deb "${{ github.workspace }}/ygs.deb"
 
       - name: Build YTVideoOverlay
         run: |
           cd YTVideoOverlay
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytvo.deb
+          mv packages/*.deb "${{ github.workspace }}/ytvo.deb"
 
       - name: Build YTABConfig
         run: |
           cd YTABConfig
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytabconfig.deb
+          mv packages/*.deb "${{ github.workspace }}/ytabconfig.deb"
 
       - name: Build YouSpeed
         run: |
           cd YouSpeed
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youspeed.deb
+          mv packages/*.deb "${{ github.workspace }}/youspeed.deb"
 
       - name: Build DontEatMyContent
         if: ${{ inputs.demc }}
         run: |
           cd DontEatMyContent
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/demc.deb
+          mv packages/*.deb "${{ github.workspace }}/demc.deb"
 
       - name: Build YouMute
         run: |
           cd YouMute
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ym.deb
+          mv packages/*.deb "${{ github.workspace }}/ym.deb"
 
       - name: Build YouLoop
         run: |
           cd YouLoop
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youloop.deb
+          mv packages/*.deb "${{ github.workspace }}/youloop.deb"
 
       - name: Build YouSlider
         run: |
           cd YouSlider
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youslider.deb
-
-      - name: Build Alderis
-        run: |
-          cd Alderis
-          make clean package DEBUG=0 FINALPACKAGE=1 ARCHS=arm64
-          mv packages/*.deb ${{ github.workspace }}/alderis.deb
+          mv packages/*.deb "${{ github.workspace }}/youslider.deb"
 
       - name: Build YouChooseQuality
         run: |
           cd YouChooseQuality
           git checkout 1585a3691b2ef0b59d42c40c31639fd8b79e2cd4
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youchoose.deb
+          mv packages/*.deb "${{ github.workspace }}/youchoose.deb"
 
       - name: Build YTSilentVote
         run: |
           cd YTSilentVote
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytnovote.deb
+          mv packages/*.deb "${{ github.workspace }}/ytnovote.deb"
 
       - name: Build YouShare
         run: |
           cd YouShare
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youshare.deb
+          mv packages/*.deb "${{ github.workspace }}/youshare.deb"
 
       - name: Build Gonerino
         run: |
           cd Gonerino
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/gonerino.deb
+          mv packages/*.deb "${{ github.workspace }}/gonerino.deb"
 
       - name: Build YouGetCaption
         run: |
           cd YouGetCaption
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ygc.deb
+          mv packages/*.deb "${{ github.workspace }}/ygc.deb"
 
       - name: Build YTweaks
         run: |
           cd YTweaks
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytweaks.deb
+          mv packages/*.deb "${{ github.workspace }}/ytweaks.deb"
 
       - name: Build YTFlags
         run: |
           cd YTFlags
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytflags.deb
+          mv packages/*.deb "${{ github.workspace }}/ytflags.deb"
 
       - name: Build iSponsorBlock
         if: ${{ inputs.isponsorblock }}
         run: |
           cd iSponsorBlock
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/isponsorblock.deb
+          mv packages/*.deb "${{ github.workspace }}/isponsorblock.deb"
 
       - name: Build YTVideoErrorAlert
         if: ${{ inputs.ytvid }}
         run: |
           cd YTVideoErrorAlert
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/ytvideoerror.deb
+          mv packages/*.deb "${{ github.workspace }}/ytvideoerror.deb"
 
       # - name: Build VolumeBoostYT
       #   if: ${{ inputs.volboost }}
       #   run: |
       #     cd VolumeBoostYT
       #     make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless ARCHS=arm64
-      #     mv packages/*.deb ${{ github.workspace }}/volboostyt.deb
+      #     mv packages/*.deb "${{ github.workspace }}/volboostyt.deb"
 
       - name: Inject Tweaks Into IPA
         run: |
@@ -357,3 +375,6 @@ jobs:
         run: |
           echo -e '### 🚀 Draft Release\n\nDraft release has been created successfully! You can view your release here: https://github.com/${{ github.repository }}/releases' >> $GITHUB_STEP_SUMMARY
 
+      - name: Job Summary - Cleanup
+        run: |
+          echo -e '### 🧹 Cleanup\n\nYou can remove previous GitHub Actions run here: https://github.com/${{ github.repository }}/actions/workflows/delete-old-workflows-run.yml And if you want to delelte old draft releases you have then here: https://github.com/${{ github.repository }}/actions/workflows/delete-old-draft-releases.yml' >> $GITHUB_STEP_SUMMARY
