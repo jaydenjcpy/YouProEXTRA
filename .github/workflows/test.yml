@@ -1,4 +1,4 @@
-name: Build YouProEXTRA IPA
+name: Build YouProEXTRA IPA (Test)
 on:
   workflow_dispatch:
     inputs:
