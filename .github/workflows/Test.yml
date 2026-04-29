@@ -307,7 +307,7 @@ jobs:
       - name: Create a Draft Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: youpro+youmod-ipa${{ github.run_number }}
+          tag_name: youproextra-ipa${{ github.run_number }}
           name: YouProEXTRA_${{ env.YT_VERSION }}_(${{ github.run_number }})
           files: YouProEXTRA_${{ env.YT_VERSION }}.ipa
           draft: true
