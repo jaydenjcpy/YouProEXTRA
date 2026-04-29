@@ -163,12 +163,6 @@ jobs:
           cd YouPiP && make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           mv packages/*.deb ${{ github.workspace }}/youpip.deb
 
-      - name: Clone and Build YouMod
-        run: |
-          git clone --quiet --depth=1 https://github.com/Tonwalter888/YouMod.git
-          cd YouMod && make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          mv packages/*.deb ${{ github.workspace }}/youmod.deb
-
       - name: Clone and Build YTUHD
         run: |
           git clone --quiet --depth=1 https://github.com/Tonwalter888/YTUHD.git
