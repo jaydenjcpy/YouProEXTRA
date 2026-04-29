@@ -72,13 +72,7 @@ jobs:
           unzip -q youtube.ipa -d ytextracted
           echo "YT_VERSION=$(grep -A 1 '<key>CFBundleVersion</key>' ytextracted/Payload/YouTube.app/Info.plist | grep '<string>' | awk -F'[><]' '{print $3}')" >> $GITHUB_ENV
 
-      - name: Get Commit Hashes
-        id: commit_hashes
-        uses: ./.github/actions/get-commit-hashes
-        with:
-          isponsorblock: ${{ inputs.isponsorblock }}
-          demc: ${{ inputs.demc }}
-          ytvid: ${{ inputs.ytvid }}
+
 
       - name: Install Dependencies
         run: brew install make ldid swiftlint dpkg
