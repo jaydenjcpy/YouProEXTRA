@@ -1,6 +1,6 @@
 # YouProEXTRA
 
-Build script by [mrdrvt99](https://github.com/mrdrvt99))
+Build script by [mrdrvt99](https://github.com/mrdrvt99)
 
 
 Based on the *FREE* YouPro tweak made by [Alibusut](https://t.me/alibusut)
