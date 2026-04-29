@@ -80,11 +80,13 @@ jobs:
       - name: Set PATH Environment Variables
         run: echo "$(brew --prefix make)/libexec/gnubin" >> $GITHUB_PATH
 
-      - name: Cache Theos
-        id: theos
-        uses: ./.github/actions/cache-theos
+
+      - name: Setup Theos
+        uses: actions/checkout@v4
         with:
-          theos_commit: ${{ steps.commit_hashes.outputs.theos }}
+          repository: theos/theos
+          path: ${{ github.workspace }}/theos
+          submodules: recursive
 
       - name: Download iOS SDK
         if: steps.theos.outputs.cache-hit != 'true'
