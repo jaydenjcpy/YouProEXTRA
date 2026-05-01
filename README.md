@@ -1,7 +1,7 @@
 # YouProEXTRA
 
 
-Based on the *FREE* YouPro tweak made by [Alibusut](https://t.me/alibusut)
+Based on the *FREE* [YouPro](https://t.me/ipastar/105) tweak made by [Alibusut](https://t.me/alibusut)
 
 Added extra features just like YTLitePlusEXTRA but for completely free
 
